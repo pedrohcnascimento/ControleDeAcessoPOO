@@ -8,7 +8,6 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-//testando git ou github
 public class ControleDeAcesso {
     // Caminho para a pasta ControleDeAcesso no diretório do usuário
     private static final File pastaControleDeAcesso = new File(System.getProperty("user.home"), "ControleDeAcesso");
