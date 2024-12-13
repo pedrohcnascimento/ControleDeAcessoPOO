@@ -3,6 +3,7 @@ package com.senai.controledeacesso;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
@@ -35,6 +36,7 @@ public class ControleDeAcesso {
     static Scanner scanner = new Scanner(System.in);
     static ExecutorService executorIdentificarAcessos = Executors.newFixedThreadPool(4);
     static ExecutorService executorCadastroIdAcesso = Executors.newSingleThreadExecutor();
+    static ArrayList <Usuario> usuario = new ArrayList<>();
 
     public static void main(String[] args) {
         verificarEstruturaDeDiretorios();
@@ -220,64 +222,32 @@ public class ControleDeAcesso {
         }
         System.out.println(tabelaCadastro);
     }
-//jk
+
     private static void cadastrarUsuario() {
         System.out.println("Escolha a opção que deseja cadastrar: \n1-Funcionário           2-Aluno");
         int opcao = scanner.nextInt();
-        if (opcao == 1){
-            System.out.print("Digite a quantidade de usuarios que deseja cadastrar:");
-            int qtdUsuarios = scanner.nextInt();
-            scanner.nextLine();
+       if (opcao == 1){
+           System.out.println("Nome:");
+           String nome = scanner.next();
+           System.out.println("Email:");
+           String email = scanner.next();
+           System.out.println("Telefone:");
+           String telefone = scanner.next();
+           usuario.add(new Usuario(usuario.indexOf(usuario), telefone, email, "Funcionario", nome, 0));
 
-            String[][] novaMatriz = new String[matrizCadastro.length + qtdUsuarios][matrizCadastro[0].length];
+        }else if (opcao==2) {
+           System.out.println("ID:");
+           int id = scanner.nextInt();
+           System.out.println("Nome:");
+           String nome = scanner.next();
+           System.out.println("Email:");
+           String email = scanner.next();
+           System.out.println("Telefone:");
+           String telefone = scanner.next();
+           usuario.add(new Usuario(id, telefone, email, "Aluno", nome, 0));
 
-            for (int linhas = 0; linhas < matrizCadastro.length; linhas++) {
-                novaMatriz[linhas] = Arrays.copyOf(matrizCadastro[linhas], matrizCadastro[linhas].length);
-            }
-
-            System.out.println("\nPreencha os dados a seguir:");
-            for (int linhas = matrizCadastro.length; linhas < novaMatriz.length; linhas++) {
-                System.out.println(matrizCadastro[0][0] + "- " + linhas);
-                novaMatriz[linhas][0] = String.valueOf(linhas);// preenche o campo id com o numero gerado pelo for
-                novaMatriz[linhas][1] = "-"; //preenche o campo idCadastro com "-"
-                novaMatriz[linhas][2] = "Funcionário";
-                for (int colunas = 3; colunas < matrizCadastro[0].length - 1; colunas++) {
-                    System.out.print(matrizCadastro[0][colunas] + ": ");
-                    novaMatriz[linhas][colunas] = scanner.nextLine();
-                }
-                novaMatriz[linhas][matrizCadastro[0].length - 1] = "-";//preenche o campo imagem com "-"
-
-                System.out.println("-----------------------Inserido com sucesso------------------------\n");
-                matrizCadastro = novaMatriz;
-            }
-        }else if (opcao==2){
-            System.out.print("Digite a quantidade de usuarios que deseja cadastrar:");
-            int qtdUsuarios = scanner.nextInt();
-            scanner.nextLine();
-
-            String[][] novaMatriz = new String[matrizCadastro.length + qtdUsuarios][matrizCadastro[0].length];
-
-            for (int linhas = 0; linhas < matrizCadastro.length; linhas++) {
-                novaMatriz[linhas] = Arrays.copyOf(matrizCadastro[linhas], matrizCadastro[linhas].length);
-            }
-
-            System.out.println("\nPreencha os dados a seguir:");
-            for (int linhas = matrizCadastro.length; linhas < novaMatriz.length; linhas++) {
-                System.out.println(matrizCadastro[0][0] + "- " + linhas);
-                novaMatriz[linhas][0] = String.valueOf(linhas);// preenche o campo id com o numero gerado pelo for
-                novaMatriz[linhas][1] = "-"; //preenche o campo idCadastro com "-"
-                novaMatriz[linhas][2] = "Aluno";
-
-                for (int colunas = 3; colunas < matrizCadastro[0].length - 1; colunas++) {
-                    System.out.print(matrizCadastro[0][colunas] + ": ");
-                    novaMatriz[linhas][colunas] = scanner.nextLine();
-                }
-                novaMatriz[linhas][matrizCadastro[0].length - 1] = "-";//preenche o campo imagem com "-"
-
-                System.out.println("-----------------------Inserido com sucesso------------------------\n");
-                matrizCadastro = novaMatriz;
-            }
-        }
+       }
+        System.out.println(usuario);
         salvarDadosNoArquivo();
     }
     private static void atualizarUsuario() {
