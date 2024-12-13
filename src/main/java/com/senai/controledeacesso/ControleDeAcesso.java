@@ -76,7 +76,7 @@ public class ControleDeAcesso {
                 case 1://Lívia
                     exibirCadastro();
                     break;
-                case 2://Kaun
+                case 2://Kauan
                     cadastrarUsuario();
                     break;
                 case 3://Leandro
@@ -220,7 +220,7 @@ public class ControleDeAcesso {
         }
         System.out.println(tabelaCadastro);
     }
-
+//jk
     private static void cadastrarUsuario() {
         System.out.println("Escolha a opção que deseja cadastrar: \n1-Funcionário           2-Aluno");
         int opcao = scanner.nextInt();
