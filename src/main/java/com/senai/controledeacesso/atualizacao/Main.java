@@ -67,7 +67,7 @@ static Scanner scanner=new Scanner(System.in);
                                     scanner.nextLine();
                                 }else {
                                     System.out.println("ops...Usuario não encontrado");
-                                }
+                                }//kldasjdkla
                             }
                             break;
                         case 3:
