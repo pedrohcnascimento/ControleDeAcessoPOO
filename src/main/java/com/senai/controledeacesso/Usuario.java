@@ -16,4 +16,16 @@ public class Usuario {
         this.email = email;
         this.telefone = telefone;
     }
+
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "ID=" + ID +
+                ", IDAcesso=" + IDAcesso +
+                ", nome='" + nome + '\'' +
+                ", Cargo='" + Cargo + '\'' +
+                ", email='" + email + '\'' +
+                ", telefone='" + telefone + '\'' +
+                '}';
+    }
 }

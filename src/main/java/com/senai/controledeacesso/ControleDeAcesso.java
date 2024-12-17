@@ -1,5 +1,6 @@
 package com.senai.controledeacesso;
 
+import javax.print.MultiDocPrintService;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -107,9 +108,16 @@ public class ControleDeAcesso {
     }
     private static void pesquisarRegistrosPorId(){
         exibirCadastro();
+        mockup();
         System.out.print("Digite o ID do usuário que deseja visulizar o registro de entrada:");
         int idBusca = scanner.nextInt();
-        System.out.println(listaUsuarios.get(idBusca));
+        scanner.nextLine();
+        listaUsuarios.get(idBusca-1);
+    }
+    private static void mockup(){
+        listaUsuarios.add(new Usuario(1,1111,"Pedro","Aluno", "pedro@gmail.com","11 99999999"));
+        listaUsuarios.add(new Usuario(2,2222,"Kauan","Aluno", "kauan@gmail.com","11 99999999"));
+        listaUsuarios.add(new Usuario(3,3333,"Rafael","Funcionário", "rafael@gmail.com","11 99999999"));
     }
 
     private static void aguardarCadastroDeIdAcesso() {
