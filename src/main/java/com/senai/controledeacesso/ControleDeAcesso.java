@@ -3,6 +3,7 @@ package com.senai.controledeacesso;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
@@ -22,10 +23,12 @@ public class ControleDeAcesso {
     static String[] cabecalho = {"ID", "IdAcesso", "Cargo", "Nome", "Telefone", "Email", "Imagem"};
     static String[][] matrizCadastro = {{"", ""}};
     public static String[][] matrizRegistrosDeAcesso = {{"", "", ""}};// inicia a matriz com uma linha e duas colunas com "" para que na primeira vez não apareça null na tabela de registros
+    public static ArrayList<Usuario> listaUsuarios = new ArrayList<>();
 
     static volatile boolean modoCadastrarIdAcesso = false;
     static int idUsuarioRecebidoPorHTTP = 0;
     static String dispositivoRecebidoPorHTTP = "Disp1";
+
 
     static String brokerUrl = "tcp://localhost:1883";  // Exemplo de
     static String topico = "IoTKIT1/UID";
@@ -92,7 +95,7 @@ public class ControleDeAcesso {
                     limparRegistros();
                     break;
                 case 7://Pedro
-                    //pesquisarRegistrosPorId();
+                    pesquisarRegistrosPorId();
                     break;
                 case 8:
                     System.out.println("Programa encerrado.");
@@ -101,6 +104,12 @@ public class ControleDeAcesso {
                     System.out.println("Opção inválida!");
             }
         } while (opcao != 8);
+    }
+    private static void pesquisarRegistrosPorId(){
+        exibirCadastro();
+        System.out.print("Digite o ID do usuário que deseja visulizar o registro de entrada:");
+        int idBusca = scanner.nextInt();
+        System.out.println(listaUsuarios.get(idBusca));
     }
 
     private static void aguardarCadastroDeIdAcesso() {
