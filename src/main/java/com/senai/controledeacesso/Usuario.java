@@ -8,9 +8,8 @@ public class Usuario {
     String email;
     String telefone;
 
-    public Usuario(int ID, int IDAcesso, String nome, String cargo, String email, String telefone) {
+    public Usuario(int ID, String nome, String cargo, String email, String telefone) {
         this.ID = ID;
-        this.IDAcesso = IDAcesso;
         this.nome = nome;
         Cargo = cargo;
         this.email = email;
