@@ -333,7 +333,12 @@ public class ServidorHTTPS {
                     System.out.println("Edição: nome : " + registro[2] + " | telefone : " + registro[3] + " | email : " + registro[4]);
 
                     // Substitui o cadastro na matriz com os novos dados
-                    ControleDeAcesso.matrizCadastro[id] = registro;
+                    ControleDeAcesso.listaUsuarios.set(id, new Usuario(
+                            Integer.parseInt(registro[0]),
+                            registro[2],
+                            registro[2],
+                            registro[4],
+                            registro[3]));
 
                     ControleDeAcesso.salvarDadosNoArquivo();
 
