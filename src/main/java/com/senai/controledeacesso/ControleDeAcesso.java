@@ -148,7 +148,7 @@ public class ControleDeAcesso {
 
     // Função que busca e atualiza a tabela com o ID recebido
     private static void criarNovoRegistroDeAcesso(String idAcessoRecebido) {
-        boolean usuarioEncontr,ado = false; // Variável para verificar se o usuário foi encontrado
+        boolean usuarioEncontrado = false; // Variável para verificar se o usuário foi encontrado
         String[][] novaMatrizRegistro = new String[matrizRegistrosDeAcesso.length][matrizRegistrosDeAcesso[0].length];
         int linhaNovoRegistro = 0;
 
