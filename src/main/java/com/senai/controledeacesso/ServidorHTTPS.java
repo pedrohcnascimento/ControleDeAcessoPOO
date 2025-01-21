@@ -258,7 +258,7 @@ public class ServidorHTTPS {
                 }
 
                 // Gera novo ID e cria o registro
-                int novoID = ControleDeAcesso.matrizCadastro.length;
+                int novoID = ControleDeAcesso.listaUsuarios.size();
 
                 JSONObject json = new JSONObject(corpoDaRequisicao.toString());
                 String nome = json.getString("nome");
@@ -274,15 +274,8 @@ public class ServidorHTTPS {
                 //Logs
                 System.out.println("nome : " + nome + " | telefone : " + telefone + " | email : " + email);
 
-                String[] novoUsuario = {String.valueOf(novoID), "-", nome, telefone, email, nomeImagem};
-                String[][] novaMatriz = new String[novoID + 1][novoUsuario[0].length()];
+                ControleDeAcesso.listaUsuarios.add(new Usuario(novoID, "-", nome, telefone, email));
 
-                for (int linhas = 0; linhas < ControleDeAcesso.matrizCadastro.length; linhas++) {
-                    novaMatriz[linhas] = Arrays.copyOf(ControleDeAcesso.matrizCadastro[linhas], ControleDeAcesso.matrizCadastro[linhas].length);
-                }
-
-                novaMatriz[novoID] = novoUsuario;
-                ControleDeAcesso.matrizCadastro = novaMatriz;
                 ControleDeAcesso.salvarDadosNoArquivo();
 
                 String responseMessage = "Cadastro recebido com sucesso!";
@@ -332,8 +325,8 @@ public class ServidorHTTPS {
                         salvarImagem(json.getString("imagem"),id+registro[2] );
                         registro[5] = id+registro[2];
                     } else {
-                        registro[5] = ControleDeAcesso.matrizCadastro[id][2].equals(registro[2])
-                                ? ControleDeAcesso.matrizCadastro[id][5]
+                        registro[5] = ControleDeAcesso.listaUsuarios.get(id).nome.equals(registro[2])
+                                ? ControleDeAcesso.listaUsuarios.get(id).imagem
                                 : nomeImagem;
                     }
                     //Logs
