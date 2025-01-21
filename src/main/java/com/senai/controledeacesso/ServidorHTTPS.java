@@ -200,11 +200,14 @@ public class ServidorHTTPS {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             exchange.getResponseHeaders().set("Content-Type", "application/json");
-            String jsonResponse = ControleDeAcesso.matrizRegistrosDeAcesso.length == 0
+            String jsonResponse = ControleDeAcesso.listaDeRegistros.isEmpty()
                     ? "[]"
                     : "[" +
-                    Arrays.stream(ControleDeAcesso.matrizRegistrosDeAcesso)
-                            .map(registro -> String.format("{\"nome\":\"%s\",\"horario\":\"%s\",\"imagem\":\"%s\"}", registro[0], registro[1], registro[2]))
+                    ControleDeAcesso.listaDeRegistros.stream()
+                            .map(registro -> String.format("{\"nome\":\"%s\",\"horario\":\"%s\",\"imagem\":\"%s\"}",
+                                    registro.usuario.nome,
+                                    registro.horararioDeRegistro,
+                                    registro.usuario.imagem))
                             .collect(Collectors.joining(",")) +
                     "]";
             byte[] bytesResposta = jsonResponse.getBytes();

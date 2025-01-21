@@ -19,8 +19,6 @@ public class ControleDeAcesso {
 
     public static final File pastaImagens = new File(pastaControleDeAcesso, "imagens");
 
-    public static String[][] matrizRegistrosDeAcesso = {{"", "", ""}};// inicia a matriz com uma linha e duas colunas com "" para que na primeira vez não apareça null na tabela de registros
-
     static volatile boolean modoCadastrarIdAcesso = false;
     static int idUsuarioRecebidoPorHTTP = 0;
     static String dispositivoRecebidoPorHTTP = "Disp1";
