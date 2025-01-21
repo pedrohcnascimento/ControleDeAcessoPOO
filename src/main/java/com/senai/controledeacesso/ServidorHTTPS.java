@@ -390,7 +390,7 @@ public class ServidorHTTPS {
                     int id = Integer.parseInt(idPath);
                     System.out.println("ID convertido para inteiro: " + id);
 
-                    if (id > 0 && id < ControleDeAcesso.matrizCadastro.length && ControleDeAcesso.matrizCadastro[id] != null) {
+                    if (id > 0 && id < ControleDeAcesso.listaUsuarios.size() && ControleDeAcesso.listaUsuarios.get(id) != null) {
                         ControleDeAcesso.idUsuarioRecebidoPorHTTP = id;
                         ControleDeAcesso.deletarUsuario();
 
@@ -561,7 +561,7 @@ public class ServidorHTTPS {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             int usuarioId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
-            String status = ControleDeAcesso.matrizCadastro[usuarioId][1].equals("-") ? "aguardando" : "sucesso";
+            String status = String.valueOf(ControleDeAcesso.listaUsuarios.get(usuarioId).IDAcesso).equals("-") ? "aguardando" : "sucesso";
 
             String response = "{\"status\":\"" + status + "\"}";
             exchange.getResponseHeaders().add("Content-Type", "application/json");
