@@ -25,8 +25,8 @@ public class ControleDeAcesso {
     static volatile boolean modoCadastrarIdAcesso = false;
     static int idUsuarioRecebidoPorHTTP = 0;
     static String dispositivoRecebidoPorHTTP = "Disp1";
-    static ArrayList<Usuario> listaUsuarios = new ArrayList<>();
-    static ArrayList<RegistroDeAcesso> listaDeRegistros = new ArrayList<>();
+    public static ArrayList<Usuario> listaUsuarios = new ArrayList<>();
+    public static ArrayList<RegistroDeAcesso> listaDeRegistros = new ArrayList<>();
 
 
     static String brokerUrl = "tcp://localhost:1883";  // Exemplo de

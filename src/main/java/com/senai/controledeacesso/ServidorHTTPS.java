@@ -222,19 +222,16 @@ public class ServidorHTTPS {
             JSONArray jsonArray = new JSONArray();
 
             // Percorre a matrizCadastro a partir da segunda linha (ignora cabeçalho)
-            for (int i = 1; i < ControleDeAcesso.matrizCadastro.length; i++) {
-                String[] registro = ControleDeAcesso.matrizCadastro[i];
-                if (registro != null) { // Verifica se a linha está preenchida
-                    JSONObject json = new JSONObject();
-                    json.put("id", registro[0]);
-                    json.put("idAcesso", (registro[1] != null && !registro[1].isEmpty()) ? registro[1] : "-");
-                    json.put("nome", registro[2]);
-                    json.put("telefone", registro[3]);
-                    json.put("email", registro[4]);
-                    json.put("imagem", registro[5] != null ? registro[5] : "-");
-
+            for (Usuario usuario : ControleDeAcesso.listaUsuarios) {
+                JSONObject json = new JSONObject();
+                    json.put("id", usuario.ID);
+                    json.put("idAcesso", usuario.IDAcesso);
+                    json.put("nome", usuario.nome);
+                    json.put("telefone", usuario.telefone);
+                    json.put("email", usuario.email);
+                    json.put("imagem", usuario.imagem != null ? usuario.imagem : "-");
                     jsonArray.put(json);
-                }
+
             }
 
             // Envia a resposta como JSON

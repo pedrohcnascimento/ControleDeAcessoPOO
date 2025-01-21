@@ -7,6 +7,7 @@ public class Usuario {
     String Cargo;
     String email;
     String telefone;
+    String imagem;
 
     public Usuario(int ID, String nome, String cargo, String email, String telefone) {
         this.ID = ID;
