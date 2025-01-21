@@ -74,35 +74,18 @@ public class ControleDeAcesso {
             opcao = scanner.nextInt();
             scanner.nextLine();
 
+            //Deixei a parte do switch mais clean - DIEGO
+
             switch (opcao) {
-                case 1://Lívia
-                    exibirCadastro();//Feito
-                    break;
-                case 2://Kaun
-                    cadastrarUsuario();//Feito
-                    break;
-                case 3://Leandro
-                    atualizarUsuario();//Feito
-                    break;
-                case 4://Sabrina
-                    deletarUsuario();//Feito
-                    break;
-                case 5:
-                    aguardarCadastroDeIdAcesso();//Suave
-                    break;
-                case 6://Pedro Matos
-                    limparRegistros();//Feito
-                    break;
-                case 7://Pedro
-                    pesquisarRegistrosPorId();//feito
-                    break;
-                case 8:
-                    salvarDadosNoArquivo();//feito
-                    salvarRegistros();//Feito
-                    System.out.println("Programa encerrado.");
-                    break;
-                default:
-                    System.out.println("Opção inválida!");
+                case 1 -> exibirCadastro();
+                case 2 -> cadastrarUsuario();
+                case 3 -> atualizarUsuario();
+                case 4 -> deletarUsuario();
+                case 5 -> aguardarCadastroDeIdAcesso();
+                case 6 -> limparRegistros();
+                case 7 -> pesquisarRegistrosPorId();
+                case 8 -> System.out.println("Encerrando o programa...");
+                default -> System.out.println("Opção inválida! Tente novamente.");
             }
         } while (opcao != 8);
     }
