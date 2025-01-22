@@ -271,7 +271,7 @@ public class ControleDeAcesso {
 
             while ((linha = reader.readLine()) != null) {
                 String[] conteudo = linha.split(",");
-                listaUsuarios.add(new Usuario(Integer.parseInt(conteudo[0]), Integer.parseInt(conteudo[1]), conteudo[2], conteudo[3], conteudo[4], conteudo[5], conteudo[6]));
+                listaUsuarios.add(new Usuario(Integer.parseInt(conteudo[0]), Integer.parseInt(conteudo[1]), conteudo[2], conteudo[3], conteudo[4], conteudo[5], "-"));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
