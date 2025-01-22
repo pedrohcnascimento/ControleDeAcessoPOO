@@ -11,22 +11,19 @@ import java.util.concurrent.Future;
 
 public class ControleDeAcesso {
     // Caminho para a pasta ControleDeAcesso no diretório do usuário
-    private static final File pastaControleDeAcesso = new File("C:\\Users\\Aluno\\Downloads\\ControleDeAcessoPOO\\src\\main\\resources");
+    private static final File pastaControleDeAcesso = new File("src/main/resources");
 
     // Caminho para o arquivo bancoDeDados.txt e para a pasta imagens
-    private static final File arquivoBancoDeDados = new File("C:\\Users\\Aluno\\Downloads\\ControleDeAcessoPOO\\src\\main\\resources\\RegistroDeUsuarios.txt");
-    private static final File arquivoRegistroAcesso = new File( "C:\\Users\\Aluno\\Downloads\\ControleDeAcessoPOO\\src\\main\\resources\\RegistroDeUsuarios.txt");
+    private static final File arquivoBancoDeDados = new File("src/main/resources/RegistroDeUsuarios.txt");
+    private static final File arquivoRegistroAcesso = new File( "src/main/resources/RegistroDeAcessos.txt");
 
     public static final File pastaImagens = new File(pastaControleDeAcesso, "imagens");
-
-    static String[][] matrizCadastro = {{"", ""}};
-    public static String[][] matrizRegistrosDeAcesso = {{"", "", ""}};// inicia a matriz com uma linha e duas colunas com "" para que na primeira vez não apareça null na tabela de registros
 
     static volatile boolean modoCadastrarIdAcesso = false;
     static int idUsuarioRecebidoPorHTTP = 0;
     static String dispositivoRecebidoPorHTTP = "Disp1";
-    static ArrayList<Usuario> listaUsuarios = new ArrayList<>();
-    static ArrayList<RegistroDeAcesso> listaDeRegistros = new ArrayList<>();
+    public static ArrayList<Usuario> listaUsuarios = new ArrayList<>();
+    public static ArrayList<RegistroDeAcesso> listaDeRegistros = new ArrayList<>();
 
 
     static String brokerUrl = "tcp://localhost:1883";  // Exemplo de
@@ -218,7 +215,7 @@ public class ControleDeAcesso {
             System.out.println("Telefone");
             String telefone = scanner.nextLine();
 
-            listaUsuarios.add(new Usuario((listaUsuarios.size()+1),(opcao == 2) ? "Aluno" : "Funcionario",nome,email,telefone));
+            listaUsuarios.add(new Usuario((listaUsuarios.size()+1),0,nome,(opcao == 2) ? "Aluno" : "Funcionario",email,telefone, "-"));
             salvarDadosNoArquivo();
         }
     }
@@ -274,7 +271,7 @@ public class ControleDeAcesso {
 
             while ((linha = reader.readLine()) != null) {
                 String[] conteudo = linha.split(",");
-                listaUsuarios.add(new Usuario(Integer.parseInt(conteudo[0]), conteudo[2], conteudo[3], conteudo[4], conteudo[5]));
+                listaUsuarios.add(new Usuario(Integer.parseInt(conteudo[0]), Integer.parseInt(conteudo[1]), conteudo[2], conteudo[3], conteudo[4], conteudo[5], conteudo[6]));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
