@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyStore;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.stream.Collectors;
 
@@ -277,7 +276,7 @@ public class ServidorHTTPS {
                 //Logs
                 System.out.println("nome : " + nome + " | telefone : " + telefone + " | email : " + email);
 
-                ControleDeAcesso.listaUsuarios.add(new Usuario(novoID, "-", nome, telefone, email));
+                ControleDeAcesso.listaUsuarios.add(new Usuario(novoID, 0, nome, telefone, email, "-", "-"));
 
                 ControleDeAcesso.salvarDadosNoArquivo();
 
@@ -338,10 +337,12 @@ public class ServidorHTTPS {
                     // Substitui o cadastro na matriz com os novos dados
                     ControleDeAcesso.listaUsuarios.set(id, new Usuario(
                             Integer.parseInt(registro[0]),
-                            registro[2],
+                            Integer.parseInt(registro[2]),
                             registro[2],
                             registro[4],
-                            registro[3]));
+                            registro[3],
+                            "-",
+                            "-"));
 
                     ControleDeAcesso.salvarDadosNoArquivo();
 
