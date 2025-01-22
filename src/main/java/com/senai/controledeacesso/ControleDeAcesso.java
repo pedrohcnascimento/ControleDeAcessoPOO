@@ -232,7 +232,7 @@ public class ControleDeAcesso {
             System.out.println("Telefone");
             String telefone = scanner.nextLine();
 
-            listaUsuarios.add(new Usuario((listaUsuarios.size()+1),0,(opcao == 2) ? "Aluno" : "Funcionario",nome,email,telefone, "-"));
+            listaUsuarios.add(new Usuario((listaUsuarios.size()+1),0,nome,(opcao == 2) ? "Aluno" : "Funcionario",email,telefone, "-"));
             salvarDadosNoArquivo();
         }
     }
