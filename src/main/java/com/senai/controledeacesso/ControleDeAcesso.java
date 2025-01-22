@@ -177,33 +177,42 @@ public class ControleDeAcesso {
         boolean encontrado = false; // Variável para verificar se o usuário foi encontrado
         int idUsuarioEscolhido = idUsuarioRecebidoPorHTTP;
         String dispositivoEscolhido = dispositivoRecebidoPorHTTP;
+        boolean idAcessoExiste = false;
 
-        if (idUsuarioRecebidoPorHTTP == 0) {
-            // Exibe a lista de usuários para o administrador escolher
+        for(Usuario usuario : listaUsuarios){
+            idAcessoExiste = usuario.IDAcesso == idUsuarioRecebidoPorHTTP;
+        }
+
+        if (!idAcessoExiste) {
+            if (idUsuarioRecebidoPorHTTP == 0) {
+                // Exibe a lista de usuários para o administrador escolher
+                for (Usuario usuario : listaUsuarios) {
+                    System.out.println(usuario.ID + " - " + usuario.nome); // Exibe ID e Nome do usuário
+                }
+                // Pede ao administrador que escolha o ID do usuário
+                System.out.print("Digite o ID do usuário para associar ao novo idAcesso: ");
+                idUsuarioEscolhido = scanner.nextInt();
+                conexaoMQTT.publicarMensagem(topico, dispositivoEscolhido);
+            }
+
+            modoCadastrarIdAcesso = true;
+            // Verifica se o ID do usuário existe na matriz
             for (Usuario usuario : listaUsuarios) {
-                System.out.println(usuario.ID + " - " + usuario.nome); // Exibe ID e Nome do usuário
+                if (usuario.ID == idUsuarioEscolhido) {
+                    usuario.IDAcesso = Integer.parseInt(novoIdAcesso);
+                    System.out.println("id de acesso " + novoIdAcesso + " associado ao usuário " + usuario.nome);
+                    conexaoMQTT.publicarMensagem("cadastro/disp", "CadastroConcluido");
+                    encontrado = true;
+                    salvarDadosNoArquivo();
+                    break;
+                }
             }
-            // Pede ao administrador que escolha o ID do usuário
-            System.out.print("Digite o ID do usuário para associar ao novo idAcesso: ");
-            idUsuarioEscolhido = scanner.nextInt();
-            conexaoMQTT.publicarMensagem(topico, dispositivoEscolhido);
-        }
-
-        modoCadastrarIdAcesso = true;
-        // Verifica se o ID do usuário existe na matriz
-        for (Usuario usuario : listaUsuarios) {
-            if (usuario.ID == idUsuarioEscolhido){
-                usuario.IDAcesso = Integer.parseInt(novoIdAcesso);
-                System.out.println("id de acesso " + novoIdAcesso + " associado ao usuário " + usuario.nome);
-                conexaoMQTT.publicarMensagem("cadastro/disp", "CadastroConcluido");
-                encontrado = true;
-                salvarDadosNoArquivo();
-                break;
+            // Se não encontrou o usuário, imprime uma mensagem
+            if (!encontrado) {
+                System.out.println("Usuário com id" + idUsuarioEscolhido + " não encontrado.");
             }
-        }
-        // Se não encontrou o usuário, imprime uma mensagem
-        if (!encontrado) {
-            System.out.println("Usuário com id" + idUsuarioEscolhido + " não encontrado.");
+        }else{
+            System.out.println("ID de acesso Já existente.");
         }
     }
 
