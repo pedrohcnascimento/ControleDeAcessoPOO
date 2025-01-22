@@ -1,5 +1,6 @@
-1,0,Aluno,çladsk,fasçlk,fçlask
-2,0,Aluno,çlfask,fçaslk,fçslak
-3,0,Aluno,lgkasj,fsçalk,flsajk
-4,0,Aluno,dsaadadas,qweqeqwewq,31312313
-5,0,Funcionario,flaskj,fçlaskj,flkasj
+1,0,zxcv,Aluno,zxcv,zxcv
+2,0,asdf,Aluno,asdf,asdf
+3,1111,qwer,Aluno,qwer,qwer
+4,0,mnvb,Funcionario,mvnb,mvnb
+5,1111,çlkj,Funcionario,çjlk,çjkl
+6,0,poiu,Funcionario,puoi,piuo
