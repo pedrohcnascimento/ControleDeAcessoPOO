@@ -163,7 +163,7 @@ public class ControleDeAcesso {
         boolean idAcessoExiste = false;
 
         for(Usuario usuario : listaUsuarios){
-            idAcessoExiste = usuario.IDAcesso == idUsuarioRecebidoPorHTTP;
+            idAcessoExiste = (usuario.IDAcesso == idUsuarioRecebidoPorHTTP);
         }
 
         if (!idAcessoExiste) {
