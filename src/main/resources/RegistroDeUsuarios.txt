@@ -1,0 +1,6 @@
+1,1111,a,Aluno,a,a
+2,0,b,Aluno,b,b
+3,0,c,Aluno,c,c
+4,0,p,Funcionario,p,p
+5,0,o,Funcionario,o,o
+6,0,ç,Funcionario,ç,ç

@@ -3,7 +3,7 @@ package com.senai.controledeacesso;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,21 +11,20 @@ import java.util.concurrent.Future;
 
 public class ControleDeAcesso {
     // Caminho para a pasta ControleDeAcesso no diretório do usuário
-    private static final File pastaControleDeAcesso = new File(System.getProperty("user.home"), "ControleDeAcesso");
+    private static final File pastaControleDeAcesso = new File("src/main/resources");
 
     // Caminho para o arquivo bancoDeDados.txt e para a pasta imagens
-    private static final File arquivoBancoDeDados = new File(pastaControleDeAcesso, "bancoDeDados.txt");
-    private static final File arquivoRegistroAcesso = new File(pastaControleDeAcesso, "resgistroDeAcesso.txt");
+    private static final File arquivoBancoDeDados = new File("src/main/resources/RegistroDeUsuarios.txt");
+    private static final File arquivoRegistroAcesso = new File( "src/main/resources/RegistroDeAcessos.txt");
 
     public static final File pastaImagens = new File(pastaControleDeAcesso, "imagens");
-
-    static String[] cabecalho = {"ID", "IdAcesso", "Cargo", "Nome", "Telefone", "Email", "Imagem"};
-    static String[][] matrizCadastro = {{"", ""}};
-    public static String[][] matrizRegistrosDeAcesso = {{"", "", ""}};// inicia a matriz com uma linha e duas colunas com "" para que na primeira vez não apareça null na tabela de registros
 
     static volatile boolean modoCadastrarIdAcesso = false;
     static int idUsuarioRecebidoPorHTTP = 0;
     static String dispositivoRecebidoPorHTTP = "Disp1";
+    public static ArrayList<Usuario> listaUsuarios = new ArrayList<>();
+    public static ArrayList<RegistroDeAcesso> listaDeRegistros = new ArrayList<>();
+
 
     static String brokerUrl = "tcp://localhost:1883";  // Exemplo de
     static String topico = "IoTKIT1/UID";
@@ -38,7 +37,7 @@ public class ControleDeAcesso {
 
     public static void main(String[] args) {
         verificarEstruturaDeDiretorios();
-        carregarDadosDoArquivo();
+        carregarDadosDoArquivo();//feito
         carregarRegistros();
         conexaoMQTT = new CLienteMQTT(brokerUrl, topico, ControleDeAcesso::processarMensagemMQTTRecebida);
         servidorHTTPS = new ServidorHTTPS(); // Inicia o servidor HTTPS
@@ -72,38 +71,35 @@ public class ControleDeAcesso {
             opcao = scanner.nextInt();
             scanner.nextLine();
 
+            //Deixei a parte do switch mais clean - DIEGO
+
             switch (opcao) {
-                case 1://Lívia
-                    exibirCadastro();
-                    break;
-                case 2://Kaun
-                    cadastrarUsuario();
-                    break;
-                case 3://Leandro
-                    atualizarUsuario();
-                    break;
-                case 4://Sabrina
-                    deletarUsuario();
-                    break;
-                case 5://NÃO MEXA
-                    aguardarCadastroDeIdAcesso();
-                    break;
-                case 6://Pedro Matos
-                    limparRegistros();
-                    break;
-                case 7://Pedro
-                    //pesquisarRegistrosPorId();
-                    break;
-                case 8:
-                    System.out.println("Programa encerrado.");
-                    break;
-                default:
-                    System.out.println("Opção inválida!");
+                case 1 -> exibirCadastro();
+                case 2 -> cadastrarUsuario();
+                case 3 -> atualizarUsuario();
+                case 4 -> deletarUsuario();
+                case 5 -> aguardarCadastroDeIdAcesso();
+                case 6 -> limparRegistros();
+                case 7 -> pesquisarRegistrosPorId();
+                case 8 -> System.out.println("Encerrando o programa...");
+                default -> System.out.println("Opção inválida! Tente novamente.");
             }
         } while (opcao != 8);
     }
 
-    private static void aguardarCadastroDeIdAcesso() {
+    private static void pesquisarRegistrosPorId(){
+        StringBuilder registros = new StringBuilder();
+        System.out.println("Digite o id do usuário que deseja visualizar:");
+        int idEscolhido = scanner.nextInt();
+        for (RegistroDeAcesso registroDeAcesso : listaDeRegistros){
+            if (idEscolhido == registroDeAcesso.usuario.ID){
+                registros.append(registroDeAcesso).append("\n");
+            }
+        }
+        System.out.println(registros);
+    }
+
+    private static void aguardarCadastroDeIdAcesso() {//N MEXE
         modoCadastrarIdAcesso = true;
         System.out.println("Aguardando nova tag ou cartão para associar ao usuário");
         // Usar Future para aguardar até que o cadastro de ID seja concluído
@@ -125,7 +121,7 @@ public class ControleDeAcesso {
         }
     }
 
-    private static void processarMensagemMQTTRecebida(String mensagem) {
+    private static void processarMensagemMQTTRecebida(String mensagem) {//N MEXE
         if (!modoCadastrarIdAcesso) {
             executorIdentificarAcessos.submit(() -> criarNovoRegistroDeAcesso(mensagem)); // Processa em thread separada
         } else {
@@ -138,30 +134,18 @@ public class ControleDeAcesso {
     // Função que busca e atualiza a tabela com o ID recebido
     private static void criarNovoRegistroDeAcesso(String idAcessoRecebido) {
         boolean usuarioEncontrado = false; // Variável para verificar se o usuário foi encontrado
-        String[][] novaMatrizRegistro = new String[matrizRegistrosDeAcesso.length][matrizRegistrosDeAcesso[0].length];
-        int linhaNovoRegistro = 0;
 
-        if (!matrizRegistrosDeAcesso[0][0].isEmpty()) {//testa se o valor da primeira posição da matriz está diferente de vazia ou "".
-            novaMatrizRegistro = new String[matrizRegistrosDeAcesso.length + 1][matrizRegistrosDeAcesso[0].length];
-            linhaNovoRegistro = matrizRegistrosDeAcesso.length;
-            for (int linhas = 0; linhas < matrizRegistrosDeAcesso.length; linhas++) {
-                novaMatrizRegistro[linhas] = Arrays.copyOf(matrizRegistrosDeAcesso[linhas], matrizRegistrosDeAcesso[linhas].length);
-            }
-        }
-        // Loop para percorrer a matriz e buscar o idAcesso
-        for (int linhas = 1; linhas < matrizCadastro.length; linhas++) { // Começa de 1 para ignorar o cabeçalho
-            String idAcessoNaMatriz = matrizCadastro[linhas][1]; // A coluna do idAcesso é a segunda coluna (índice 1)
+        // Loop para percorrer a lista e buscar o idAcesso
+        for (Usuario usuario : listaUsuarios) {
+            int idNaLista = usuario.ID;
+            String idAcessoNaLista = String.valueOf(usuario.IDAcesso); // A coluna do idAcesso é a segunda coluna (índice 1)
 
             // Verifica se o idAcesso da matriz corresponde ao idAcesso recebido
-            if (idAcessoNaMatriz.equals(idAcessoRecebido)) {
-                novaMatrizRegistro[linhaNovoRegistro][0] = matrizCadastro[linhas][2]; // Assume que o nome do usuário está na coluna 3
-                novaMatrizRegistro[linhaNovoRegistro][1] = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-                novaMatrizRegistro[linhaNovoRegistro][2] = matrizCadastro[linhas][5];
-                System.out.println("Usuário encontrado: " +
-                        novaMatrizRegistro[linhaNovoRegistro][0] + " - " +
-                        novaMatrizRegistro[linhaNovoRegistro][1]);
+            if (idAcessoNaLista.equals(idAcessoRecebido)) {
+                listaDeRegistros.add(new RegistroDeAcesso(listaUsuarios.get(idNaLista-1), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))));
+
+                System.out.println("Usuário encontrado: " + usuario.ID + " - " + usuario.nome);
                 usuarioEncontrado = true; // Marca que o usuário foi encontrado
-                matrizRegistrosDeAcesso = novaMatrizRegistro;
                 salvarRegistros();
                 break; // Sai do loop, pois já encontrou o usuário
             }
@@ -172,35 +156,34 @@ public class ControleDeAcesso {
         }
     }
 
-    private static void cadastrarNovoIdAcesso(String novoIdAcesso) {
+    private static void cadastrarNovoIdAcesso(String novoIdAcesso) {//Feito
         boolean encontrado = false; // Variável para verificar se o usuário foi encontrado
-        String idUsuarioEscolhido = String.valueOf(idUsuarioRecebidoPorHTTP);
+        int idUsuarioEscolhido = idUsuarioRecebidoPorHTTP;
         String dispositivoEscolhido = dispositivoRecebidoPorHTTP;
 
         if (idUsuarioRecebidoPorHTTP == 0) {
             // Exibe a lista de usuários para o administrador escolher
-            for (String[] usuario : matrizCadastro) {
-                System.out.println(usuario[0] + " - " + usuario[2]); // Exibe ID e Nome do usuário
+            for (Usuario usuario : listaUsuarios) {
+                System.out.println(usuario.ID + " - " + usuario.nome); // Exibe ID e Nome do usuário
             }
             // Pede ao administrador que escolha o ID do usuário
             System.out.print("Digite o ID do usuário para associar ao novo idAcesso: ");
-            idUsuarioEscolhido = scanner.nextLine();
+            idUsuarioEscolhido = scanner.nextInt();
             conexaoMQTT.publicarMensagem(topico, dispositivoEscolhido);
         }
 
         modoCadastrarIdAcesso = true;
         // Verifica se o ID do usuário existe na matriz
-        for (int linhas = 1; linhas < matrizCadastro.length; linhas++) {
-            if (matrizCadastro[linhas][0].equals(idUsuarioEscolhido)) { // Coluna 0 é o idUsuario
-                matrizCadastro[linhas][1] = novoIdAcesso; // Atualiza a coluna 1 com o novo idAcesso
-                System.out.println("id de acesso " + novoIdAcesso + " associado ao usuário " + matrizCadastro[linhas][2]);
+        for (Usuario usuario : listaUsuarios) {
+            if (usuario.ID == idUsuarioEscolhido){
+                usuario.IDAcesso = Integer.parseInt(novoIdAcesso);
+                System.out.println("id de acesso " + novoIdAcesso + " associado ao usuário " + usuario.nome);
                 conexaoMQTT.publicarMensagem("cadastro/disp", "CadastroConcluido");
                 encontrado = true;
                 salvarDadosNoArquivo();
                 break;
             }
         }
-
         // Se não encontrou o usuário, imprime uma mensagem
         if (!encontrado) {
             System.out.println("Usuário com id" + idUsuarioEscolhido + " não encontrado.");
@@ -209,76 +192,32 @@ public class ControleDeAcesso {
 
     // Funções de CRUD
     private static void exibirCadastro() {
-        StringBuilder tabelaCadastro = new StringBuilder();
-
-        for (String[] usuarioLinha : matrizCadastro) {
-            for (int colunas = 0; colunas < matrizCadastro[0].length; colunas++) {
-                int largura = colunas < 2 ? (colunas == 0 ? 4 : 8) : 25;
-                tabelaCadastro.append(String.format("%-" + largura + "s | ", usuarioLinha[colunas]));
-            }
-            tabelaCadastro.append("\n");
+        System.out.println("ID      ID Acesso" );
+        for (Usuario usuario : listaUsuarios){
+            System.out.println(usuario);
         }
-        System.out.println(tabelaCadastro);
     }
 
     private static void cadastrarUsuario() {
         System.out.println("Escolha a opção que deseja cadastrar: \n1-Funcionário           2-Aluno");
         int opcao = scanner.nextInt();
-        if (opcao == 1){
             System.out.print("Digite a quantidade de usuarios que deseja cadastrar:");
             int qtdUsuarios = scanner.nextInt();
             scanner.nextLine();
 
-            String[][] novaMatriz = new String[matrizCadastro.length + qtdUsuarios][matrizCadastro[0].length];
-
-            for (int linhas = 0; linhas < matrizCadastro.length; linhas++) {
-                novaMatriz[linhas] = Arrays.copyOf(matrizCadastro[linhas], matrizCadastro[linhas].length);
-            }
-
+        for (int i = 0; i < qtdUsuarios; i++) {
             System.out.println("\nPreencha os dados a seguir:");
-            for (int linhas = matrizCadastro.length; linhas < novaMatriz.length; linhas++) {
-                System.out.println(matrizCadastro[0][0] + "- " + linhas);
-                novaMatriz[linhas][0] = String.valueOf(linhas);// preenche o campo id com o numero gerado pelo for
-                novaMatriz[linhas][1] = "-"; //preenche o campo idCadastro com "-"
-                novaMatriz[linhas][2] = "Funcionário";
-                for (int colunas = 3; colunas < matrizCadastro[0].length - 1; colunas++) {
-                    System.out.print(matrizCadastro[0][colunas] + ": ");
-                    novaMatriz[linhas][colunas] = scanner.nextLine();
-                }
-                novaMatriz[linhas][matrizCadastro[0].length - 1] = "-";//preenche o campo imagem com "-"
 
-                System.out.println("-----------------------Inserido com sucesso------------------------\n");
-                matrizCadastro = novaMatriz;
-            }
-        }else if (opcao==2){
-            System.out.print("Digite a quantidade de usuarios que deseja cadastrar:");
-            int qtdUsuarios = scanner.nextInt();
-            scanner.nextLine();
+            System.out.println("Nome:");
+            String nome = scanner.nextLine();
+            System.out.println("Email: ");
+            String email = scanner.nextLine();
+            System.out.println("Telefone");
+            String telefone = scanner.nextLine();
 
-            String[][] novaMatriz = new String[matrizCadastro.length + qtdUsuarios][matrizCadastro[0].length];
-
-            for (int linhas = 0; linhas < matrizCadastro.length; linhas++) {
-                novaMatriz[linhas] = Arrays.copyOf(matrizCadastro[linhas], matrizCadastro[linhas].length);
-            }
-
-            System.out.println("\nPreencha os dados a seguir:");
-            for (int linhas = matrizCadastro.length; linhas < novaMatriz.length; linhas++) {
-                System.out.println(matrizCadastro[0][0] + "- " + linhas);
-                novaMatriz[linhas][0] = String.valueOf(linhas);// preenche o campo id com o numero gerado pelo for
-                novaMatriz[linhas][1] = "-"; //preenche o campo idCadastro com "-"
-                novaMatriz[linhas][2] = "Aluno";
-
-                for (int colunas = 3; colunas < matrizCadastro[0].length - 1; colunas++) {
-                    System.out.print(matrizCadastro[0][colunas] + ": ");
-                    novaMatriz[linhas][colunas] = scanner.nextLine();
-                }
-                novaMatriz[linhas][matrizCadastro[0].length - 1] = "-";//preenche o campo imagem com "-"
-
-                System.out.println("-----------------------Inserido com sucesso------------------------\n");
-                matrizCadastro = novaMatriz;
-            }
+            listaUsuarios.add(new Usuario((listaUsuarios.size()+1),0,nome,(opcao == 2) ? "Aluno" : "Funcionario",email,telefone, "-"));
+            salvarDadosNoArquivo();
         }
-        salvarDadosNoArquivo();
     }
     private static void atualizarUsuario() {
         exibirCadastro();
@@ -294,17 +233,16 @@ public class ControleDeAcesso {
         switch (opcao){
             case 1:
                 System.out.print("Informe o novo nome: ");
-                matrizCadastro[idUsuario][3] = scanner.nextLine();
+                listaUsuarios.get(idUsuario-1).nome = scanner.nextLine();
                 break;
             case 2:
                 System.out.print("Informe o novo telefone: ");
-                matrizCadastro[idUsuario][4] = scanner.nextLine();
+                listaUsuarios.get(idUsuario-1).telefone = scanner.nextLine();
                 break;
             case 3:
                 System.out.print("Informe o novo email: ");
-                matrizCadastro[idUsuario][5] = scanner.nextLine();
+                listaUsuarios.get(idUsuario-1).email = scanner.nextLine();
                 break;
-
         }
 
         System.out.println("---------Atualizado com sucesso-----------");
@@ -313,25 +251,13 @@ public class ControleDeAcesso {
     }
 
     public static void deletarUsuario() {
-        String[][] novaMatriz = new String[matrizCadastro.length - 1][matrizCadastro[0].length];
-        int idUsuario = idUsuarioRecebidoPorHTTP;
-        if (idUsuarioRecebidoPorHTTP == 0) {
+
             exibirCadastro();
             System.out.println("Escolha um id para deletar o cadastro:");
-            idUsuario = scanner.nextInt();
+            int idUsuario = scanner.nextInt();
             scanner.nextLine();
-        }
+            listaUsuarios.remove(idUsuario-1);
 
-        for (int i = 1, j = 1; i < matrizCadastro.length; i++) {
-            if (i == idUsuario)
-                continue;
-            novaMatriz[j] = matrizCadastro[i];
-            novaMatriz[j][0]= String.valueOf(j);
-            j++;
-        }
-
-        matrizCadastro = novaMatriz;
-        matrizCadastro[0]=cabecalho;
         salvarDadosNoArquivo();
         System.out.println("-----------------------Deletado com sucesso------------------------\n");
         idUsuarioRecebidoPorHTTP = 0;
@@ -342,32 +268,21 @@ public class ControleDeAcesso {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(arquivoBancoDeDados))) {
             String linha;
-            StringBuilder conteudo = new StringBuilder();
 
             while ((linha = reader.readLine()) != null) {
-                if (!linha.trim().isEmpty()) {
-                    conteudo.append(linha).append("\n");
-                }
+                String[] conteudo = linha.split(",");
+                listaUsuarios.add(new Usuario(Integer.parseInt(conteudo[0]), Integer.parseInt(conteudo[1]), conteudo[2], conteudo[3], conteudo[4], conteudo[5], "-"));
             }
-
-            if (!conteudo.toString().trim().isEmpty()) {
-                String[] linhasDaTabela = conteudo.toString().split("\n");
-                matrizCadastro = new String[linhasDaTabela.length][cabecalho.length];
-                for (int i = 0; i < linhasDaTabela.length; i++) {
-                    matrizCadastro[i] = linhasDaTabela[i].split(",");
-                }
-            }
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        matrizCadastro[0] = cabecalho;
     }
 
     public static void salvarDadosNoArquivo() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoBancoDeDados))) {
-            for (String[] linha : matrizCadastro) {
-                writer.write(String.join(",", linha) + "\n");
+            for (Usuario usuario : listaUsuarios) {
+                usuario.ID = listaUsuarios.indexOf(usuario) + 1;
+                writer.write(usuario + "\n");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -419,8 +334,8 @@ public class ControleDeAcesso {
     }
     private static void salvarRegistros(){
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoRegistroAcesso))) {
-            for (String[] linha : matrizRegistrosDeAcesso) {
-                writer.write(String.join(",", linha) + "\n");
+            for (RegistroDeAcesso registroDeAcesso : listaDeRegistros) {
+                writer.write(registroDeAcesso + "\n");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -429,32 +344,18 @@ public class ControleDeAcesso {
     private static void carregarRegistros(){
         try (BufferedReader reader = new BufferedReader(new FileReader(arquivoRegistroAcesso))) {
             String linha;
-            StringBuilder conteudo = new StringBuilder();
 
             while ((linha = reader.readLine()) != null) {
-                if (!linha.trim().isEmpty()) {
-                    conteudo.append(linha).append("\n");
-                }
-            }
-
-            if (!conteudo.toString().trim().isEmpty()) {
-                String[] linhasDaTabela = conteudo.toString().split("\n");
-                matrizRegistrosDeAcesso = new String[linhasDaTabela.length][cabecalho.length];
-                for (int i = 0; i < linhasDaTabela.length; i++) {
-                    matrizRegistrosDeAcesso[i] = linhasDaTabela[i].split(",");
-                }
+                String[] conteudo = linha.split(",");
+                listaDeRegistros.add(new RegistroDeAcesso(listaUsuarios.get(Integer.parseInt(conteudo[1])), conteudo[0]));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
     public static void limparRegistros(){
-        for (int i = 0; i < matrizRegistrosDeAcesso.length; i++) {
-            for (int j = 0; j < matrizRegistrosDeAcesso[0].length; j++) {
-             matrizRegistrosDeAcesso[i][j] = "";
-            }
-        }
-        salvarDadosNoArquivo();
+        listaDeRegistros.clear();
+        salvarRegistros();
         System.out.println("-----------------------Deletado com sucesso------------------------\n");
     }
 }

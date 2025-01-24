@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyStore;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.stream.Collectors;
 
@@ -200,11 +199,14 @@ public class ServidorHTTPS {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             exchange.getResponseHeaders().set("Content-Type", "application/json");
-            String jsonResponse = ControleDeAcesso.matrizRegistrosDeAcesso.length == 0
+            String jsonResponse = ControleDeAcesso.listaDeRegistros.isEmpty()
                     ? "[]"
                     : "[" +
-                    Arrays.stream(ControleDeAcesso.matrizRegistrosDeAcesso)
-                            .map(registro -> String.format("{\"nome\":\"%s\",\"horario\":\"%s\",\"imagem\":\"%s\"}", registro[0], registro[1], registro[2]))
+                    ControleDeAcesso.listaDeRegistros.stream()
+                            .map(registro -> String.format("{\"nome\":\"%s\",\"horario\":\"%s\",\"imagem\":\"%s\"}",
+                                    registro.usuario.nome,
+                                    registro.horararioDeRegistro,
+                                    registro.usuario.imagem))
                             .collect(Collectors.joining(",")) +
                     "]";
             byte[] bytesResposta = jsonResponse.getBytes();
@@ -222,19 +224,16 @@ public class ServidorHTTPS {
             JSONArray jsonArray = new JSONArray();
 
             // Percorre a matrizCadastro a partir da segunda linha (ignora cabeçalho)
-            for (int i = 1; i < ControleDeAcesso.matrizCadastro.length; i++) {
-                String[] registro = ControleDeAcesso.matrizCadastro[i];
-                if (registro != null) { // Verifica se a linha está preenchida
-                    JSONObject json = new JSONObject();
-                    json.put("id", registro[0]);
-                    json.put("idAcesso", (registro[1] != null && !registro[1].isEmpty()) ? registro[1] : "-");
-                    json.put("nome", registro[2]);
-                    json.put("telefone", registro[3]);
-                    json.put("email", registro[4]);
-                    json.put("imagem", registro[5] != null ? registro[5] : "-");
-
+            for (Usuario usuario : ControleDeAcesso.listaUsuarios) {
+                JSONObject json = new JSONObject();
+                    json.put("id", usuario.ID);
+                    json.put("idAcesso", usuario.IDAcesso);
+                    json.put("nome", usuario.nome);
+                    json.put("telefone", usuario.telefone);
+                    json.put("email", usuario.email);
+                    json.put("imagem", usuario.imagem != null ? usuario.imagem : "-");
                     jsonArray.put(json);
-                }
+
             }
 
             // Envia a resposta como JSON
@@ -261,7 +260,7 @@ public class ServidorHTTPS {
                 }
 
                 // Gera novo ID e cria o registro
-                int novoID = ControleDeAcesso.matrizCadastro.length;
+                int novoID = ControleDeAcesso.listaUsuarios.size();
 
                 JSONObject json = new JSONObject(corpoDaRequisicao.toString());
                 String nome = json.getString("nome");
@@ -277,15 +276,8 @@ public class ServidorHTTPS {
                 //Logs
                 System.out.println("nome : " + nome + " | telefone : " + telefone + " | email : " + email);
 
-                String[] novoUsuario = {String.valueOf(novoID), "-", nome, telefone, email, nomeImagem};
-                String[][] novaMatriz = new String[novoID + 1][novoUsuario[0].length()];
+                ControleDeAcesso.listaUsuarios.add(new Usuario(novoID, 0, nome, telefone, email, "-", "-"));
 
-                for (int linhas = 0; linhas < ControleDeAcesso.matrizCadastro.length; linhas++) {
-                    novaMatriz[linhas] = Arrays.copyOf(ControleDeAcesso.matrizCadastro[linhas], ControleDeAcesso.matrizCadastro[linhas].length);
-                }
-
-                novaMatriz[novoID] = novoUsuario;
-                ControleDeAcesso.matrizCadastro = novaMatriz;
                 ControleDeAcesso.salvarDadosNoArquivo();
 
                 String responseMessage = "Cadastro recebido com sucesso!";
@@ -335,15 +327,22 @@ public class ServidorHTTPS {
                         salvarImagem(json.getString("imagem"),id+registro[2] );
                         registro[5] = id+registro[2];
                     } else {
-                        registro[5] = ControleDeAcesso.matrizCadastro[id][2].equals(registro[2])
-                                ? ControleDeAcesso.matrizCadastro[id][5]
+                        registro[5] = ControleDeAcesso.listaUsuarios.get(id).nome.equals(registro[2])
+                                ? ControleDeAcesso.listaUsuarios.get(id).imagem
                                 : nomeImagem;
                     }
                     //Logs
                     System.out.println("Edição: nome : " + registro[2] + " | telefone : " + registro[3] + " | email : " + registro[4]);
 
                     // Substitui o cadastro na matriz com os novos dados
-                    ControleDeAcesso.matrizCadastro[id] = registro;
+                    ControleDeAcesso.listaUsuarios.set(id, new Usuario(
+                            Integer.parseInt(registro[0]),
+                            Integer.parseInt(registro[2]),
+                            registro[2],
+                            registro[4],
+                            registro[3],
+                            "-",
+                            "-"));
 
                     ControleDeAcesso.salvarDadosNoArquivo();
 
@@ -395,7 +394,7 @@ public class ServidorHTTPS {
                     int id = Integer.parseInt(idPath);
                     System.out.println("ID convertido para inteiro: " + id);
 
-                    if (id > 0 && id < ControleDeAcesso.matrizCadastro.length && ControleDeAcesso.matrizCadastro[id] != null) {
+                    if (id > 0 && id < ControleDeAcesso.listaUsuarios.size() && ControleDeAcesso.listaUsuarios.get(id) != null) {
                         ControleDeAcesso.idUsuarioRecebidoPorHTTP = id;
                         ControleDeAcesso.deletarUsuario();
 
@@ -566,7 +565,7 @@ public class ServidorHTTPS {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             int usuarioId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
-            String status = ControleDeAcesso.matrizCadastro[usuarioId][1].equals("-") ? "aguardando" : "sucesso";
+            String status = String.valueOf(ControleDeAcesso.listaUsuarios.get(usuarioId).IDAcesso).equals("-") ? "aguardando" : "sucesso";
 
             String response = "{\"status\":\"" + status + "\"}";
             exchange.getResponseHeaders().add("Content-Type", "application/json");
