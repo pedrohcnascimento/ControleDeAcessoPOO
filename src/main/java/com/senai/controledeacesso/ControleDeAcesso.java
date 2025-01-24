@@ -193,11 +193,11 @@ public class ControleDeAcesso {
     // Funções de CRUD
     private static void exibirCadastro() {
         System. out .printf( "----------------------------------------------------------------------%n" );
-        System. out .printf( " ID      ID Acesso       Nome        Cargo       Email       Telefone %n" );
+        System. out .printf( " ID   ID Acesso   Nome        Cargo       Email       Telefone %n" );
         System. out .printf( "----------------------------------------------------------------------%n" );
 
         for (Usuario usuario : listaUsuarios){
-            System.out.printf( "| %-2d | %-4d | %10s | %-12s | %-10s | %-10s |%n",usuario.ID , usuario.IDAcesso , usuario.nome , usuario.Cargo , usuario.email , usuario.telefone );
+            System.out.printf( "| %-2d | %-4d | %-10s | %-12s | %-10s | %-10s |%n",usuario.ID , usuario.IDAcesso , usuario.nome , usuario.Cargo , usuario.email , usuario.telefone );
         }
         System. out .printf( "----------------------------------------------------------------------%n" );
         System.out.println();
