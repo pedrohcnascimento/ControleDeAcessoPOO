@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 
 public class ControleDeAcesso {
     // Caminho para a pasta ControleDeAcesso no diretório do usuário
-    private static final File pastaControleDeAcesso = new File("src/main/resources");
+    private static final File pastaControleDeAcesso = new File("src/main/java/com/senai/controledeacesso");
 
     // Caminho para o arquivo bancoDeDados.txt e para a pasta imagens
     private static final File arquivoBancoDeDados = new File("src/main/resources/RegistroDeUsuarios.txt");
@@ -22,6 +22,7 @@ public class ControleDeAcesso {
     static volatile boolean modoCadastrarIdAcesso = false;
     static int idUsuarioRecebidoPorHTTP = 0;
     static String dispositivoRecebidoPorHTTP = "Disp1";
+
     public static ArrayList<Usuario> listaUsuarios = new ArrayList<>();
     public static ArrayList<RegistroDeAcesso> listaDeRegistros = new ArrayList<>();
 
@@ -142,7 +143,7 @@ public class ControleDeAcesso {
 
             // Verifica se o idAcesso da matriz corresponde ao idAcesso recebido
             if (idAcessoNaLista.equals(idAcessoRecebido)) {
-                listaDeRegistros.add(new RegistroDeAcesso(listaUsuarios.get(idNaLista), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))));
+                listaDeRegistros.add(new RegistroDeAcesso(listaUsuarios.get(idNaLista - 1), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))));
 
                 System.out.println("Usuário encontrado: " + usuario.ID + " - " + usuario.nome);
                 usuarioEncontrado = true; // Marca que o usuário foi encontrado
