@@ -161,7 +161,8 @@ public class ControleDeAcesso {
         boolean encontrado = false; // Variável para verificar se o usuário foi encontrado
         int idUsuarioEscolhido = idUsuarioRecebidoPorHTTP;
         String dispositivoEscolhido = dispositivoRecebidoPorHTTP;
-
+        
+        //Verifica se o ID enviado pelo prompt já está sendo usado
         for (Usuario usuario : listaUsuarios){
             if (usuario.IDAcesso == Integer.parseInt(novoIdAcesso)){
                 System.out.println("Este ID de acesso "+novoIdAcesso+" já esta sendo usado por outro usuário");
