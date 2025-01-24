@@ -142,7 +142,7 @@ public class ControleDeAcesso {
 
             // Verifica se o idAcesso da matriz corresponde ao idAcesso recebido
             if (idAcessoNaLista.equals(idAcessoRecebido)) {
-                listaDeRegistros.add(new RegistroDeAcesso(listaUsuarios.get(idNaLista), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))));
+                listaDeRegistros.add(new RegistroDeAcesso(listaUsuarios.get(idNaLista-1), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))));
 
                 System.out.println("Usuário encontrado: " + usuario.ID + " - " + usuario.nome);
                 usuarioEncontrado = true; // Marca que o usuário foi encontrado
