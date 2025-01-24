@@ -137,6 +137,7 @@ public class ControleDeAcesso {
 
         // Loop para percorrer a lista e buscar o idAcesso
         for (Usuario usuario : listaUsuarios) {
+
             int idNaLista = usuario.ID;
             String idAcessoNaLista = String.valueOf(usuario.IDAcesso); // A coluna do idAcesso é a segunda coluna (índice 1)
 
@@ -161,6 +162,13 @@ public class ControleDeAcesso {
         int idUsuarioEscolhido = idUsuarioRecebidoPorHTTP;
         String dispositivoEscolhido = dispositivoRecebidoPorHTTP;
 
+        for (Usuario usuario : listaUsuarios){
+            if (usuario.IDAcesso == Integer.parseInt(novoIdAcesso)){
+                System.out.println("Este ID de acesso "+novoIdAcesso+" já esta sendo usado por outro usuário");
+                return;
+            }
+        }
+
         if (idUsuarioRecebidoPorHTTP == 0) {
             // Exibe a lista de usuários para o administrador escolher
             for (Usuario usuario : listaUsuarios) {
@@ -175,6 +183,7 @@ public class ControleDeAcesso {
         modoCadastrarIdAcesso = true;
         // Verifica se o ID do usuário existe na matriz
         for (Usuario usuario : listaUsuarios) {
+
             if (usuario.ID == idUsuarioEscolhido){
                 usuario.IDAcesso = Integer.parseInt(novoIdAcesso);
                 System.out.println("id de acesso " + novoIdAcesso + " associado ao usuário " + usuario.nome);
