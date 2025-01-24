@@ -189,9 +189,6 @@ public class ControleDeAcesso {
             if (!encontrado) {
                 System.out.println("Usuário com id" + idUsuarioEscolhido + " não encontrado.");
             }
-        }else{
-            System.out.println("ID de acesso Já existente.");
-        }
     }
 
     // Funções de CRUD
