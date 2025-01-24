@@ -4,3 +4,4 @@
 4,0,z,Aluno,z,z
 5,3333,y,Aluno,y,y
 6,0,x,Aluno,x,x
+7,0,Arthur,11983081600,arthurhenrrique1705@gmail.com,-

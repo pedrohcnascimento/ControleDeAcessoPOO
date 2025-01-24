@@ -161,13 +161,7 @@ public class ControleDeAcesso {
         boolean encontrado = false; // Variável para verificar se o usuário foi encontrado
         int idUsuarioEscolhido = idUsuarioRecebidoPorHTTP;
         String dispositivoEscolhido = dispositivoRecebidoPorHTTP;
-        boolean idAcessoExiste = false;
 
-        for(Usuario usuario : listaUsuarios){
-            idAcessoExiste = (usuario.IDAcesso == idUsuarioRecebidoPorHTTP);
-        }
-
-        if (!idAcessoExiste) {
             if (idUsuarioRecebidoPorHTTP == 0) {
                 // Exibe a lista de usuários para o administrador escolher
                 for (Usuario usuario : listaUsuarios) {
